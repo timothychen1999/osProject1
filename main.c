@@ -75,7 +75,7 @@ void psjf(int proccnt){
 	for(int i = 0;i<=mxlen+20;i++){
 		for(int j = 0;j<proccnt;j++)if(length[j]==i)procpri[j] = shorter++;
 	}
-	fprintf(stderr,"%d %d %d\n",procpri[0],procpri[1],procpri[2]);
+	//fprintf(stderr,"%d %d %d\n",procpri[0],procpri[1],procpri[2]);
 
 	int cnt = proccnt;
 	for(;cnt>0;){
