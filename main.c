@@ -21,6 +21,7 @@ int started = 0;
 cpu_set_t chdset;
 int primin;
 int primax;
+
 char policy[20];
 void fifo(int proccnt){
 	int cnt = proccnt;
@@ -31,10 +32,11 @@ void fifo(int proccnt){
 			int pid = fork();
 			if(pid==0){
 					pid = getpid();
-					sched_setaffinity(0,sizeof(chdset),&chdset);
+					
 					struct sched_param para;
 					para.sched_priority = primax-started;
 					sched_setscheduler(0,SCHED_FIFO,&para);
+					sched_setaffinity(0,sizeof(chdset),&chdset);
 					// proc ready
 					struct timespec st,et;
 					int len = length[i];
@@ -64,6 +66,60 @@ void fifo(int proccnt){
 	for(int i = 0;i<proccnt;i++){waitpid(chdpid[i],NULL,0);
 		fprintf(stdout, "%s %d\n",name[i],chdpid[i] );
 	}
+}
+void psjf(int proccnt){
+	int procpri[10];
+	int mxlen = -1;
+	for(int i = 0;i<proccnt;i++)mxlen = mxlen>length[i];
+	int shorter = 0;
+	for(int i = 0;i<=mxlen+20;i++){
+		for(int j = 0;j<proccnt;j++)if(length[j]==i)procpri[j] = shorter++;
+	}
+
+	int cnt = proccnt;
+	for(;cnt>0;){
+		for(int i = 0;i<proccnt;i++)if(begin[i] == tu){
+			cnt--;
+			started++;
+			int pid = fork();
+			if(pid==0){
+					pid = getpid();
+					
+					struct sched_param para;
+					para.sched_priority = primax-procpri[i];
+					sched_setscheduler(0,SCHED_FIFO,&para);
+					sched_setaffinity(0,sizeof(chdset),&chdset);
+					// proc ready
+					struct timespec st,et;
+					int len = length[i];
+					clock_gettime(CLOCK_REALTIME,&st);
+					for(volatile int j = 0;j<len;j++){
+						volatile unsigned long i; for(i=0;i<1000000UL;i++);
+					}
+					clock_gettime(CLOCK_REALTIME,&et);
+					// print to output
+					// require root
+					FILE* f = fopen("/dev/kmsg","w");
+					fprintf(f, "[Project1] %d %lu.%09lu %lu.%09lu\n",pid,st.tv_sec,st.tv_nsec,et.tv_sec,et.tv_nsec );
+					// done
+					exit(EXIT_SUCCESS);			
+			}else{
+				// proc detached
+				chdpid[i] = pid;
+
+			}
+			//fprintf(stderr, "process %s started\n",name[i] );
+		}
+		timeunit();
+		tu++;
+		
+	}
+	fprintf(stderr, "All process started.\n");
+	for(int i = 0;i<proccnt;i++){waitpid(chdpid[i],NULL,0);
+		fprintf(stdout, "%s %d\n",name[i],chdpid[i] );
+	}
+
+
 }
 int main(){
 	cpu_set_t schset;
