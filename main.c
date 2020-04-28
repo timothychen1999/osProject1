@@ -70,11 +70,12 @@ void fifo(int proccnt){
 void psjf(int proccnt){
 	int procpri[10];
 	int mxlen = -1;
-	for(int i = 0;i<proccnt;i++)mxlen = mxlen>length[i];
+	for(int i = 0;i<proccnt;i++)mxlen = mxlen>length[i]?mxlen:length[i];
 	int shorter = 0;
 	for(int i = 0;i<=mxlen+20;i++){
 		for(int j = 0;j<proccnt;j++)if(length[j]==i)procpri[j] = shorter++;
 	}
+	fprintf(stderr,"%d %d %d\n",procpri[0],procpri[1],procpri[2]);
 
 	int cnt = proccnt;
 	for(;cnt>0;){
@@ -136,7 +137,20 @@ int main(){
 	for(int i = 0;i<processin;i++){
 		scanf("%s %d %d",name[i],&begin[i],&length[i]);
 	}
-	fifo(processin);
+	switch(policy[0]){
+		case 'P':
+		case 'p':
+			psjf(processin);
+			break;
+		case 'F':
+		case 'f':
+			fifo(processin);
+			break;
+		default:
+			fprintf(stderr,"No such policy : %s\n",policy);
+			exit(-1);
+
+	}
 
 }
 
