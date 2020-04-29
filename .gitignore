@@ -2,3 +2,6 @@
 *.swp
 *.o
 *.out
+*.gz
+OS_PJ1_Test/*
+OS_PJ1_Test

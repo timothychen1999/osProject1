@@ -1,5 +1,6 @@
 all:
-	sudo gcc main.c -o main.o
-	chmod u+s main.o
+	@echo 'Waring, this process require su'
+	@sudo gcc main.c -o main.o
+	@sudo chmod u+s main.o
 clean:
-	rm -f *.o
+	@rm -f *.o
