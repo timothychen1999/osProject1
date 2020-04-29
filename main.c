@@ -37,6 +37,8 @@ void fifo(int proccnt){
 					para.sched_priority = primax-started;
 					sched_setscheduler(0,SCHED_FIFO,&para);
 					sched_setaffinity(0,sizeof(chdset),&chdset);
+					struct sched_param runningpara;
+					runningpara.sched_priority = primin;
 					// proc ready
 					struct timespec st,et;
 					int len = length[i];
@@ -45,6 +47,7 @@ void fifo(int proccnt){
 						volatile unsigned long i; for(i=0;i<1000000UL;i++);
 					}
 					clock_gettime(CLOCK_REALTIME,&et);
+					sched_setscheduler(0,SCHED_FIFO,&runningpara);
 					// print to output
 					// require root
 					FILE* f = fopen("/dev/kmsg","w");
@@ -90,6 +93,8 @@ void psjf(int proccnt){
 					para.sched_priority = primax-procpri[i];
 					sched_setscheduler(0,SCHED_FIFO,&para);
 					sched_setaffinity(0,sizeof(chdset),&chdset);
+					struct sched_param runningpara;
+					runningpara.sched_priority = primin;
 					// proc ready
 					struct timespec st,et;
 					int len = length[i];
@@ -98,6 +103,7 @@ void psjf(int proccnt){
 						volatile unsigned long i; for(i=0;i<1000000UL;i++);
 					}
 					clock_gettime(CLOCK_REALTIME,&et);
+					sched_setscheduler(0,SCHED_FIFO,&runningpara);
 					// print to output
 					// require root
 					FILE* f = fopen("/dev/kmsg","w");
@@ -160,6 +166,8 @@ void sjf(int proccnt){
 					clock_gettime(CLOCK_REALTIME,&et);
 					// print to output
 					// require root
+					runningpara.sched_priority = primin;
+					sched_setscheduler(0,SCHED_FIFO,&runningpara);
 					FILE* f = fopen("/dev/kmsg","w");
 					fprintf(f, "[Project1] %d %lu.%09lu %lu.%09lu\n",pid,st.tv_sec,st.tv_nsec,et.tv_sec,et.tv_nsec );
 					// done
