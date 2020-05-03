@@ -1,4 +1,4 @@
-make
+sudo make
 for file in "./OS_PJ1_Test"/*; do
     echo "Processing $file..."
     tmp=${file%.txt}
