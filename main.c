@@ -205,7 +205,10 @@ void rr(int proccnt){
 	int cnt = proccnt;
 	int turn = -1;
 	int runninglst[10];
+	int queue[10000];
 	int isrunnging = 0;
+	int quids = 0;
+	int onq = 0;
 	int nxtchk = -1;
 	int flag = 0;
 	//int runninglst[10];
@@ -218,6 +221,9 @@ void rr(int proccnt){
 				nxtchk = tu+500;
 				turn = i;
 				flag = 1;
+			}else{
+				//reg for running
+				queue[quids++] = i;
 			}
 			runninglst[i] = 1;
 			int pid = fork();
@@ -268,9 +274,9 @@ void rr(int proccnt){
 
 			//find next to run
 			if(isrunnging==0)continue;
-			while(runninglst[turn]==0){
-				turn = turn+1;
-				if(turn>=proccnt)turn -= proccnt;
+			while(turn == -1 || runninglst[turn]==0){
+				turn = queue[onq++];
+				//if(turn>=proccnt)turn -= proccnt;
 			}
 			nxtchk = tu+500;
 			high(chdpid[turn]);
@@ -280,13 +286,13 @@ void rr(int proccnt){
 			int pturn = turn;
 			//next run
 			low(chdpid[turn]);
+			//reg for nxt
+			queue[quids++] = turn;
 			do{
-				turn = turn+1;
-				if(turn>=proccnt)turn -= proccnt;
+				turn = queue[onq++];
 			}while(runninglst[turn]==0);
 			nxtchk = tu+500;
 			high(chdpid[turn]);
-			nxtchk = tu+500;
 			//fprintf(stderr, "switch from %d to %d\n",pturn,turn );
 
 		}
